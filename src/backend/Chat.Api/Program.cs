@@ -1,10 +1,10 @@
-using Chat.Infrastructure.Extensions;
 using Chat.Application.Extensions;
+using Chat.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplicationLayer();
+builder.Services.AddInfrastructureLayer(builder.Configuration);
 
 builder.Services.AddOpenApi();
 

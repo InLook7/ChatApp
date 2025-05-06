@@ -6,7 +6,7 @@ namespace Chat.Application.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
     {
         services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<IRoomService, RoomService>();
