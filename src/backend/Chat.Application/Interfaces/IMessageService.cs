@@ -7,5 +7,5 @@ public interface IMessageService
 {
     Task<Result<IEnumerable<MessageDto>>> GetAllByRoomIdAsync(int roomId);
 
-    Task<MessageDto> CreateAsync(MessageDto messageDto);
+    Task<Result<MessageDto>> CreateAsync(MessageDto messageDto);
 }

@@ -38,9 +38,23 @@ public class MessageService : IMessageService
         return Result.Ok(MessageMapper.ToMessageDto(messages));
     }
 
-    public async Task<MessageDto> CreateAsync(MessageDto messageDto)
+    public async Task<Result<MessageDto>> CreateAsync(MessageDto messageDto)
     {
         _logger.LogInformation("Creating a new message by User {userId}...", messageDto.UserId);
+
+        var room = await _unitOfWork.RoomRepository.GetByIdAsync(messageDto.RoomId);
+        if (room == null)
+        {
+            _logger.LogWarning("Room {roomId} does not exist.", messageDto.RoomId);
+            return Result.Fail($"Room {messageDto.RoomId} was not found.");
+        }
+
+        var user = await _unitOfWork.UserRepository.GetByIdAsync(messageDto.UserId);
+        if (user == null)
+        {
+            _logger.LogWarning("User {userId} does not exist.", messageDto.UserId);
+            return Result.Fail($"User {messageDto.UserId} was not found.");
+        }
 
         var message = new Message
         {
@@ -54,6 +68,6 @@ public class MessageService : IMessageService
         await _unitOfWork.SaveAsync();
 
         _logger.LogInformation("Successfully created Message {messageId}.", message.Id);
-        return MessageMapper.ToMessageDto(message);
+        return Result.Ok(MessageMapper.ToMessageDto(message));
     }
 }

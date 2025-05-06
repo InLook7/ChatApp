@@ -16,6 +16,7 @@ public class UnitOfWork : IUnitOfWork
 
     public IMessageRepository MessageRepository => new MessageRepository(_dbContext);
     public IRoomRepository RoomRepository => new RoomRepository(_dbContext);
+    public IUserRepository UserRepository => new UserRepository(_dbContext);
 
     public async Task SaveAsync()
     {
