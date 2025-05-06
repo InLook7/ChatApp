@@ -4,6 +4,7 @@ using Chat.Application.Mappers;
 using Chat.Domain.Entities;
 using Chat.Domain.Interfaces;
 using FluentResults;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace Chat.Application.Services;
@@ -12,13 +13,16 @@ public class MessageService : IMessageService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<MessageService> _logger;
+    private readonly IValidator<MessageDto> _validator;
 
     public MessageService(
         IUnitOfWork unitOfWork,
-        ILogger<MessageService> logger)
+        ILogger<MessageService> logger,
+        IValidator<MessageDto> validator)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _validator = validator;
     }
 
     public async Task<Result<IEnumerable<MessageDto>>> GetAllByRoomIdAsync(int roomId)
@@ -41,6 +45,13 @@ public class MessageService : IMessageService
     public async Task<Result<MessageDto>> CreateAsync(MessageDto messageDto)
     {
         _logger.LogInformation("Creating a new message by User {userId}...", messageDto.UserId);
+
+        var validationResult = await _validator.ValidateAsync(messageDto);
+        if (!validationResult.IsValid)
+        {
+            _logger.LogWarning("Validation failed.");
+            return Result.Fail(validationResult.Errors.Select(e => e.ErrorMessage));
+        }
 
         var room = await _unitOfWork.RoomRepository.GetByIdAsync(messageDto.RoomId);
         if (room == null)
