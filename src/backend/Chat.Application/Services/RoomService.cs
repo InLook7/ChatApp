@@ -25,7 +25,7 @@ public class RoomService : IRoomService
 
         var rooms = await _unitOfWork.RoomRepository.GetAllAsync();
 
-        _logger.LogInformation("Successfully retrieved {roomCount} rooms", rooms.Count());
+        _logger.LogInformation("Successfully retrieved {roomCount} rooms.", rooms.Count());
         return RoomMapper.ToRoomDto(rooms); 
     }
 }

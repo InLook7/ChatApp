@@ -29,12 +29,12 @@ public class MessageService : IMessageService
         if (room == null)
         {
             _logger.LogWarning("Room {roomId} does not exist.", roomId);
-            return Result.Fail($"Room {roomId} was not found");
+            return Result.Fail($"Room {roomId} was not found.");
         }
 
         var messages = await _unitOfWork.MessageRepository.GetAllByRoomIdAsync(roomId);
 
-        _logger.LogInformation("Successfully retrieved {messageCount} messages", messages.Count());
+        _logger.LogInformation("Successfully retrieved {messageCount} messages.", messages.Count());
         return Result.Ok(MessageMapper.ToMessageDto(messages));
     }
 
@@ -53,7 +53,7 @@ public class MessageService : IMessageService
         await _unitOfWork.MessageRepository.CreateAsync(message);
         await _unitOfWork.SaveAsync();
 
-        _logger.LogInformation("Successfully created Message {messageId}", message.Id);
+        _logger.LogInformation("Successfully created Message {messageId}.", message.Id);
         return MessageMapper.ToMessageDto(message);
     }
 }
