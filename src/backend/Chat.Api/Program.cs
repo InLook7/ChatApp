@@ -1,3 +1,4 @@
+using Chat.Api.Endpoints;
 using Chat.Application.Extensions;
 using Chat.Infrastructure.Extensions;
 
@@ -14,5 +15,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.MapRoomEndpoints();
 
 app.Run();
