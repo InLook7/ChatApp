@@ -18,4 +18,9 @@ public class RoomRepository : IRoomRepository
     {
         return await _dbContext.Rooms.ToListAsync();
     }
+
+    public async Task<Room?> GetByIdAsync(int id)
+    {
+        return await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == id);
+    }
 }
