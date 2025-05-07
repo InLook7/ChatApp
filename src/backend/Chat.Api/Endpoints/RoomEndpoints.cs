@@ -30,7 +30,7 @@ public static class RoomEndpoints
 
         if (result.IsFailed)
         {
-            return TypedResults.BadRequest(result.Errors.Select(e => e.Message));
+            return TypedResults.BadRequest(result.Errors);
         }
 
         return TypedResults.Ok(result.Value);

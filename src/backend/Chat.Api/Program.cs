@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Chat.Api.Endpoints;
+using Chat.Api.Middleware;
 using Chat.Application.Extensions;
 using Chat.Infrastructure.Extensions;
 using Scalar.AspNetCore;
@@ -23,6 +24,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 var versionedGroup = app.NewVersionedApi()
     .MapGroup("api/v{version:apiVersion}")
