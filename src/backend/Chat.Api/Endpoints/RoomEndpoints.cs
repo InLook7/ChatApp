@@ -8,8 +8,11 @@ public static class RoomEndpoints
     {
         var group = app.MapGroup("rooms");
 
-        group.MapGet("/", GetRooms);
-        group.MapGet("/{roomId}/messages", GetMessagesByRoomId);
+        group.MapGet("/", GetRooms)
+            .MapToApiVersion(1);     
+
+        group.MapGet("/{roomId}/messages", GetMessagesByRoomId)
+            .MapToApiVersion(1);
     }
 
     private static async Task<IResult> GetRooms(IRoomService roomService)
