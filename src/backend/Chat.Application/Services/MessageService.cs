@@ -60,11 +60,14 @@ public class MessageService : IMessageService
             return Result.Fail($"Room {messageDto.RoomId} was not found.");
         }
 
-        var user = await _unitOfWork.UserRepository.GetByIdAsync(messageDto.UserId);
-        if (user == null)
+        if (messageDto.UserId != null)
         {
-            _logger.LogWarning("User {userId} does not exist.", messageDto.UserId);
-            return Result.Fail($"User {messageDto.UserId} was not found.");
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(messageDto.UserId);
+            if (user == null)
+            {
+                _logger.LogWarning("User {userId} does not exist.", messageDto.UserId);
+                return Result.Fail($"User {messageDto.UserId} was not found.");
+            }
         }
 
         var message = new Message

@@ -17,6 +17,7 @@ public class MessageRepository : IMessageRepository
     public async Task<IEnumerable<Message>> GetAllByRoomIdAsync(int roomId)
     {
         return await _dbContext.Messages
+            .Include(m => m.User)
             .Where(m => m.RoomId == roomId)
             .ToListAsync();
     }

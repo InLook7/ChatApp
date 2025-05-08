@@ -6,7 +6,7 @@ public class Message
     public string Content { get; set; }
     public DateTime CreatedAt { get; set; }
     public int RoomId { get; set; }
-    public int UserId { get; set; }
+    public int? UserId { get; set; }
 
     // Navigation properties
     public Room Room { get; set; }
