@@ -1,3 +1,4 @@
+using Chat.Api.Mappers;
 using Chat.Application.Interfaces;
 
 namespace Chat.Api.Endpoints;
@@ -19,7 +20,8 @@ public static class RoomEndpoints
     {
         var rooms = await roomService.GetAllAsync();
 
-        return TypedResults.Ok(rooms);
+        var response = RoomModelMapper.ToRoomModel(rooms);
+        return TypedResults.Ok(response);
     }
 
     private static async Task<IResult> GetMessagesByRoomId(
@@ -30,9 +32,10 @@ public static class RoomEndpoints
 
         if (result.IsFailed)
         {
-            return TypedResults.BadRequest(result.Errors);
+            return TypedResults.BadRequest(result.Errors.Select(e => e.Message));
         }
 
-        return TypedResults.Ok(result.Value);
+        var response = MessageModelMapper.ToMessageModel(result.Value);
+        return TypedResults.Ok(response);
     }
 }
