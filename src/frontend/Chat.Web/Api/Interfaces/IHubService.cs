@@ -5,6 +5,8 @@ namespace Chat.Web.Api.Interfaces;
 
 public interface IHubService
 {
+    void Initialize();
+
     Task StartAsync();
 
     Task StopAsync();

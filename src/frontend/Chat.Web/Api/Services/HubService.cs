@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Chat.Common.Requests;
 using Chat.Common.Responses;
 using Chat.Web.Api.Interfaces;
@@ -7,16 +8,31 @@ namespace Chat.Web.Api.Services;
 
 public class HubService : IHubService
 {
-    private readonly HubConnection _hubConnection;
+    private readonly ILocalStorageService _localStorage;
+    private HubConnection _hubConnection;
 
-    public HubService(HubConnection hubConnection)
+    public HubService(ILocalStorageService localStorage)
     {
-        _hubConnection = hubConnection;
+        _localStorage = localStorage;
+    }
+    
+    public void Initialize()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl("{CHAT_APP_BACKEND}/chat", options =>
+            {
+                options.AccessTokenProvider = async () =>
+                {
+                    var token = await _localStorage.GetItemAsync<string>("authToken");
+                    return string.IsNullOrWhiteSpace(token) ? null : token;
+                };
+            })
+            .Build();
     }
 
     public async Task StartAsync()
     {
-        if(_hubConnection.State == HubConnectionState.Disconnected)
+        if (_hubConnection.State == HubConnectionState.Disconnected)
         {
             await _hubConnection.StartAsync();
         }

@@ -78,7 +78,7 @@ versionedGroup.MapAuthEndpoints();
 app.MapHub<ChatHub>("chat");
 
 app.UseCors(builder => builder
-    .WithOrigins("${CHAT_APP_WEBAPP}")
+    .WithOrigins("{CHAT_APP_WEBAPP}")
     .AllowAnyMethod()
     .AllowAnyHeader()
 );
