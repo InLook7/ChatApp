@@ -1,0 +1,76 @@
+@inject IAuthApiService authApiService
+
+@if (IsOpen)
+{
+    <div class="dialog-backdrop">
+        <div class="dialog">
+            <h3>@Title</h3>
+
+            <div>
+                <input placeholder="Username" @bind="username" />
+            </div>
+
+            <div>
+                <input type="password" placeholder="Password" @bind="password" />
+            </div>
+
+            <div class="dialog-buttons">
+                <button class="btn" @onclick="Submit">Submit</button>
+                <button class="btn" @onclick="Close">Close</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] 
+    public string Title { get; set; }
+
+    [Parameter] 
+    public bool IsOpen { get; set; }
+
+    [Parameter] 
+    public EventCallback<bool> IsOpenChanged { get; set; }
+
+    [Parameter] 
+    public EventCallback OnLoginSuccess { get; set; }
+
+    private string username;
+    private string password;
+
+    private async Task Submit()
+    {
+        if (Title == "Login")
+        {
+            var request = new UserLoginRequest
+            {
+                UserName = username,
+                Password = password
+            };
+
+            await authApiService.LoginAsync(request);
+
+            await OnLoginSuccess.InvokeAsync();
+        }
+        else
+        {
+            var request = new UserRegisterRequest
+            {
+                UserName = username,
+                Password = password
+            };
+
+            await authApiService.RegisterAsync(request);
+        }
+
+        await Close();
+    }
+
+    private async Task Close()
+    {
+        username = string.Empty;
+        password = string.Empty;
+
+        await IsOpenChanged.InvokeAsync(false);
+    }
+}

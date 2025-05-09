@@ -1,0 +1,153 @@
+﻿@page "/"
+@inject IMessageApiService messageApiService
+@inject IRoomApiService roomApiService
+@inject ITokenService tokenService
+@inject IHubService hubService
+
+<div class="layout">
+    <div class="content-wrapper">
+        <div class="content-inner">
+            <!-- Topics -->
+            <aside class="topics-sidebar">
+                <div class="topics-container">
+                    <div class="topics-header">
+                        <h2 class="topics-title">Topics</h2>
+                    </div>
+                    <div class="topics-list">
+                        @foreach (var room in rooms)
+                        {
+                            <Room Name="@room.Name" OnClick="() => JoinRoom(room)"/>
+                        }
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Chat -->
+            <section class="chat-section">
+                <div class="chat-header">
+                    <div class="chat-room-info">
+                        @if (selectedRoom != null)
+                        {
+                            <div class="chat-room-image">
+                                <img src=@($"img/{selectedRoom.Name}.png") alt="@selectedRoom.Name" />
+                            </div>
+                            <div>@selectedRoom.Name</div>
+                        }
+                    </div>
+                    <hr class="chat-divider" />
+                </div>
+
+                <div class="chat-messages">
+                    <div class="messages-list">
+                        @foreach (var message in messages)
+                        {
+                            <Message MessageDetails="@message"
+                                Username="@(userNameId == message.UserId ? userName : message.UserName ?? "Anonym")"
+                                Alignment="@(userNameId == message.UserId ? "own" : "")" />
+                        }
+                    </div>
+                </div>
+
+                <div class="chat-input-wrapper">
+                    <div class="chat-input-container">
+                        <input type="text" placeholder="Type here..." class="chat-input" @bind="textMessage" />
+
+                        <button @onclick="SendMessageAsync" class="send-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" class="send-icon">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7-7 7M5 12h14"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                @if (textErrors.Any())
+                {
+                    <div class="error-messages">
+                        <ul>
+                            @foreach (var error in textErrors)
+                            {
+                                <li>@error</li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </section>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    private List<RoomModel> rooms = new List<RoomModel>();
+    private List<MessageModel> messages = new List<MessageModel>();
+    private RoomModel? selectedRoom;
+    private string? userName = string.Empty;
+    private int? userNameId;
+    private string textMessage = string.Empty;
+    private List<string> textErrors = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        rooms = await roomApiService.GetAllRooms();
+
+        userNameId = await tokenService.GetUserIdAsync();
+        userName = await tokenService.GetUserNameAsync();
+        if (userName == null)
+        {
+            userName = "Anonym";
+        }
+
+        hubService.Initialize();
+        hubService.OnReceiveMessage(HandleReceivedMessage);
+        hubService.OnReceiveError(HandleReceivedError);
+
+        await hubService.StartAsync();
+        await JoinRoom(rooms.First());
+    }
+
+    private async Task JoinRoom(RoomModel room)
+    {
+        if (selectedRoom != null)
+        {
+            await hubService.LeaveChatAsync(selectedRoom.Id);
+        }
+
+        selectedRoom = room;
+        
+        await hubService.JoinChatAsync(room.Id);
+        messages = await messageApiService.GetMessagesByRoomId(room.Id);
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SendMessageAsync()
+    {
+        var request = new SendMessageRequest
+        {
+            Content = textMessage,
+            CreatedAt = DateTime.UtcNow,
+            RoomId = selectedRoom.Id,
+            UserId = userNameId
+        };
+
+        await hubService.SendMessageAsync(request);
+
+        textMessage = string.Empty;
+    }
+
+    private void HandleReceivedMessage(MessageModel message)
+    {
+        messages.Add(message);
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleReceivedError(List<string> errors)
+    {
+        textErrors = errors;
+
+        InvokeAsync(StateHasChanged);
+    }
+}

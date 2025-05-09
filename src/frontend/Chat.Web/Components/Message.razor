@@ -1,0 +1,37 @@
+<div class="message-bubble @ColorMessage() @Alignment">
+    <div class="message-username">
+        @Username
+    </div>
+    <div class="message-content">
+        @MessageDetails.Content
+    </div>
+    <div class="message-time">
+        @MessageDetails.CreatedAt.ToString("HH:mm")
+    </div>
+</div>
+
+@code 
+{
+    [Parameter] 
+    public MessageModel MessageDetails { get; set; }
+
+    [Parameter] 
+    public string Username { get; set; }
+
+    [Parameter]
+    public string Alignment { get; set; }
+
+    [Parameter] 
+    public string BackgroundColor { get; set; }
+
+    private string ColorMessage()
+    {
+        return MessageDetails.Sentiment switch
+        {
+            "Positive" => "message-positive",
+            "Neutral" => "message-neutral",
+            "Negative" => "message-negative",
+            _ => ""
+        };
+    }
+}

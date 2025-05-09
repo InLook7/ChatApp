@@ -1,0 +1,20 @@
+<div class="room-item" @onclick="OnClick">
+    <div class="room-icon">
+        <img src=@($"img/{Name}.png") alt="Topic">
+    </div>
+
+    <div class="room-name-wrapper">
+        <div class="room-name">
+            @Name
+        </div>
+    </div>
+</div>
+
+@code 
+{
+    [Parameter] 
+    public string Name { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+}

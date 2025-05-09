@@ -1,6 +1,61 @@
 ﻿@inherits LayoutComponentBase
+@inject IAuthApiService authApiService
+@inject IHubService hubService
+
 <div class="page">
     <main>
+        <header class="header">
+            <div class="title">Chat</div>
+
+            <div class="actions">
+                @if (!isLoggedIn)
+                {
+                    <button class="btn" @onclick='() => OpenDialog("Login")'>Login</button>
+                    <button class="btn" @onclick='() => OpenDialog("Register")'>Register</button>
+                }
+                else
+                {
+                    <button class="btn" @onclick='Logout'>Logout</button>
+                }
+            </div>
+        </header>
+
         @Body
+
+        <ModalDialog Title="@dialogTitle"
+            IsOpen="@isDialogOpen"
+            IsOpenChanged="@((value) => isDialogOpen = value)"
+            OnLoginSuccess="OnLoginSuccess" />
     </main>
 </div>
+
+@code {
+    private string dialogTitle = string.Empty;
+    private bool isDialogOpen = false;
+    private bool isLoggedIn = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await authApiService.GetToken();
+
+        isLoggedIn = !string.IsNullOrEmpty(token);
+    }
+
+    private void OpenDialog(string title)
+    {
+        dialogTitle = title;
+        isDialogOpen = true;
+    }
+
+    private async Task Logout()
+    {
+        await authApiService.LogoutAsync();
+
+        isLoggedIn = false;
+    }
+
+    private void OnLoginSuccess()
+    {
+        isLoggedIn = true;
+    }
+}

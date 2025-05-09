@@ -1,0 +1,48 @@
+.message-bubble {
+    padding: 0.875rem;
+    border-radius: 0.5rem;
+    max-width: 28rem;
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background-image: linear-gradient(to right, var(--start-color), var(--end-color));
+}
+
+:root {
+    --start-color: #4f46e5;
+    --end-color: #06b6d4;
+}
+
+.message-username {
+    color: white;
+    font-style: italic;
+    font-size: 0.75rem;
+}
+
+.message-content {
+    color: white;
+    font-weight: bold;
+}
+
+.message-time {
+    color: white;
+    font-style: italic;
+}
+
+.message-positive {
+    background: linear-gradient(98.63deg, #56b409 0%, #93d022 100%);
+}
+
+.message-neutral {
+    background: linear-gradient(98.63deg, #318bf2 0%, #22e1ee 100%);
+}
+
+.message-negative {
+    background: linear-gradient(98.63deg, #fb5f33 0%, #faa124 100%);
+}
+
+.own {
+    align-self: flex-end;
+    border-radius: 1rem 1rem 0 1rem;
+}
