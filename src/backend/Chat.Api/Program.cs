@@ -45,7 +45,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddAzureSignalR(builder.Configuration.GetValue<string>("AzureSignalR"));
 
 builder.Services.AddApiVersioning(options =>
 {
