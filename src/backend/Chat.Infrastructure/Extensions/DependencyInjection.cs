@@ -1,3 +1,5 @@
+using Azure;
+using Azure.AI.TextAnalytics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +10,7 @@ using Chat.Domain.Interfaces;
 using Chat.Infrastructure.Auth;
 using Chat.Infrastructure.Persistence;
 using Chat.Infrastructure.Persistence.Data;
+using Chat.Infrastructure.Analysis;
 
 namespace Chat.Infrastructure.Extensions;
 
@@ -22,8 +25,14 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ISentimentAnalysis, SentimentAnalysis>();
 
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+        services.AddSingleton(new TextAnalyticsClient(
+            new Uri(configuration["TextAnalyticsEndpoint"]), 
+            new AzureKeyCredential(configuration["TextAnalyticsApiKey"])
+        ));
 
         return services;
     }

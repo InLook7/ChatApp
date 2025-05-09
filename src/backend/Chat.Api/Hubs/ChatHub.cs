@@ -9,10 +9,14 @@ namespace Chat.Api.Hubs;
 public class ChatHub : Hub<IChatHubClient>
 {
     private readonly IMessageService _messageService;
+    private readonly ISentimentAnalysis _sentimentAnalysis;
 
-    public ChatHub(IMessageService messageService)
+    public ChatHub(
+        IMessageService messageService,
+        ISentimentAnalysis sentimentAnalysis)
     {
         _messageService = messageService;
+        _sentimentAnalysis = sentimentAnalysis;
     }
 
     public async Task JoinChat(int roomId)
@@ -44,6 +48,15 @@ public class ChatHub : Hub<IChatHubClient>
         }
         else
         {
+            var sentimentDto = new SentimentDto
+            {
+                MessageId = result.Value.Id,
+                Content = result.Value.Content
+            };
+
+            var sentiment = await _sentimentAnalysis.AnalyzeSentimentAsync(sentimentDto);
+            result.Value.Sentiment = sentiment;
+
             var response = MessageModelMapper.ToMessageModel(result.Value);
 
             await Clients.Group($"room_{result.Value.RoomId}")

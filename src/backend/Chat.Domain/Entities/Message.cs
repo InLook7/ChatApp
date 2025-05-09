@@ -11,4 +11,5 @@ public class Message
     // Navigation properties
     public Room Room { get; set; }
     public User User { get; set; }
+    public Sentiment Sentiment { get; set; }
 }

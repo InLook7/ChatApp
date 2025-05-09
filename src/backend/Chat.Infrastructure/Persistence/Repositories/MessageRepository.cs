@@ -18,6 +18,7 @@ public class MessageRepository : IMessageRepository
     {
         return await _dbContext.Messages
             .Include(m => m.User)
+            .Include(m => m.Sentiment)
             .Where(m => m.RoomId == roomId)
             .ToListAsync();
     }

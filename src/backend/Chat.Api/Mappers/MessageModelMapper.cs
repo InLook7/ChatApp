@@ -13,7 +13,9 @@ public static class MessageModelMapper
             Content = messageDto.Content,
             CreatedAt = messageDto.CreatedAt,
             RoomId = messageDto.RoomId,
-            UserId = messageDto.UserId
+            UserId = messageDto.UserId,
+            UserName = messageDto.UserName,
+            Sentiment = messageDto.Sentiment
         };
     }
 

@@ -7,6 +7,7 @@ public interface IUnitOfWork : IAsyncDisposable
     IMessageRepository MessageRepository { get; }
     IRoomRepository RoomRepository { get; }
     IUserRepository UserRepository { get; }
+    ISentimentRepository SentimentRepository { get; }
 
     Task SaveAsync();
 }
