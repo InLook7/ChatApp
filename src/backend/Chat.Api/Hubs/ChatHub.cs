@@ -57,7 +57,7 @@ public class ChatHub : Hub<IChatHubClient>
             var sentiment = await _sentimentAnalysis.AnalyzeSentimentAsync(sentimentDto);
             result.Value.Sentiment = sentiment;
 
-            var response = MessageModelMapper.ToMessageModel(result.Value);
+            var response = result.Value.ToMessageModel();
 
             await Clients.Group($"room_{result.Value.RoomId}")
                 .ReceiveMessage(response);

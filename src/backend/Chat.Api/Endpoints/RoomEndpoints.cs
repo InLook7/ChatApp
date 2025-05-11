@@ -20,7 +20,7 @@ public static class RoomEndpoints
     {
         var rooms = await roomService.GetAllAsync();
 
-        var response = RoomModelMapper.ToRoomModel(rooms);
+        var response = rooms.ToRoomModels();
         return TypedResults.Ok(response);
     }
 
@@ -35,7 +35,7 @@ public static class RoomEndpoints
             return TypedResults.BadRequest(result.Errors.Select(e => e.Message));
         }
 
-        var response = MessageModelMapper.ToMessageModel(result.Value);
+        var response = result.Value.ToMessageModels();
         return TypedResults.Ok(response);
     }
 }

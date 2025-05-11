@@ -5,7 +5,7 @@ namespace Chat.Application.Mappers;
 
 public static class MessageMapper
 {
-    public static MessageDto ToMessageDto(Message message)
+    public static MessageDto ToMessageDto(this Message message)
     {
         return new MessageDto
         {
@@ -19,7 +19,7 @@ public static class MessageMapper
         };
     }
 
-    public static IEnumerable<MessageDto> ToMessageDto(IEnumerable<Message> messages)
+    public static IEnumerable<MessageDto> ToMessageDtos(this IEnumerable<Message> messages)
     {
         return messages.Select(ToMessageDto).ToList();
     }

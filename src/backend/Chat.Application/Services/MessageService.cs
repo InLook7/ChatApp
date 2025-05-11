@@ -39,7 +39,7 @@ public class MessageService : IMessageService
         var messages = await _unitOfWork.MessageRepository.GetAllByRoomIdAsync(roomId);
 
         _logger.LogInformation("Successfully retrieved {messageCount} messages.", messages.Count());
-        return Result.Ok(MessageMapper.ToMessageDto(messages));
+        return Result.Ok(messages.ToMessageDtos());
     }
 
     public async Task<Result<MessageDto>> CreateAsync(MessageDto messageDto)
@@ -82,6 +82,6 @@ public class MessageService : IMessageService
         await _unitOfWork.SaveAsync();
 
         _logger.LogInformation("Successfully created Message {messageId}.", message.Id);
-        return Result.Ok(MessageMapper.ToMessageDto(message));
+        return Result.Ok(message.ToMessageDto());
     }
 }

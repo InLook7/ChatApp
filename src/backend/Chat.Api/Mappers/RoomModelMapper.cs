@@ -5,7 +5,7 @@ namespace Chat.Api.Mappers;
 
 public static class RoomModelMapper
 {
-    public static RoomModel ToRoomModel(RoomDto roomDto)
+    public static RoomModel ToRoomModel(this RoomDto roomDto)
     {
         return new RoomModel
         {
@@ -14,7 +14,7 @@ public static class RoomModelMapper
         };
     }
 
-    public static IEnumerable<RoomModel> ToRoomModel(IEnumerable<RoomDto> roomDtos)
+    public static IEnumerable<RoomModel> ToRoomModels(this IEnumerable<RoomDto> roomDtos)
     {
         return roomDtos.Select(ToRoomModel).ToList();
     }
