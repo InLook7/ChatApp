@@ -1,10 +1,12 @@
+using Xunit;
+using NSubstitute;
+using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Chat.Application.Interfaces;
+using Chat.Application.Mappers;
 using Chat.Application.Services;
 using Chat.Domain.Entities;
 using Chat.Domain.Interfaces;
-using Microsoft.Extensions.Logging;
-using NSubstitute;
-using Xunit;
 
 namespace Chat.Application.UnitTests.ServiceTests;
 
@@ -26,7 +28,7 @@ public class RoomServiceTests
     public async Task GetAllAsync_GetAllRooms_ReturnsRoomDtos()
     {
         // Arrange
-         var rooms = new List<Room>
+        var rooms = new List<Room>
         {
             new Room() { Id = 1, Name = "TestName1" },
             new Room() { Id = 2, Name = "TestName1" },
@@ -43,7 +45,7 @@ public class RoomServiceTests
         // Assert
         await _unitOfWork.RoomRepository.Received(1).GetAllAsync();
 
-        Assert.NotNull(rooms);
-        Assert.Equal(rooms.Count(), rooms.Count());
+        Assert.Equal(rooms.Count, result.Count());
+        result.Should().BeEquivalentTo(rooms.ToRoomDtos());
     }
 }

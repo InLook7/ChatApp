@@ -1,13 +1,15 @@
 using Xunit;
 using NSubstitute;
-using Microsoft.Extensions.Logging;
+using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
 using Chat.Application.Dtos;
 using Chat.Application.Interfaces;
 using Chat.Application.Services;
 using Chat.Domain.Entities;
 using Chat.Domain.Interfaces;
+using Chat.Application.Mappers;
 
 namespace Chat.Application.UnitTests.ServiceTests;
 
@@ -55,8 +57,9 @@ public class MessageServiceTests
         // Assert
         await _unitOfWork.RoomRepository.Received(1).GetByIdAsync(room.Id);
 
-        Assert.NotNull(result.Value);
-        Assert.Equal(messages.Count(), result.Value.Count());
+        Assert.True(result.IsSuccess);
+        Assert.Equal(messages.Count, result.Value.Count());
+        result.Value.Should().BeEquivalentTo(messages.ToMessageDtos());
     }
 
     [Fact]
@@ -78,7 +81,7 @@ public class MessageServiceTests
     }
 
     [Fact]
-    public async Task CreateAsync_CreateValidMessage_ReturnsSuccessfulProcess()
+    public async Task CreateAsync_CreateValidMessage_ReturnsSuccess()
     {
         // Arrange
         var messageDto = new MessageDto()
@@ -91,12 +94,12 @@ public class MessageServiceTests
 
         _validator.ValidateAsync(Arg.Any<MessageDto>(), CancellationToken.None)
             .Returns(new ValidationResult());
-        _unitOfWork.MessageRepository.CreateAsync(Arg.Any<Message>())
-            .Returns(Task.CompletedTask);
         _unitOfWork.RoomRepository.GetByIdAsync(messageDto.RoomId)
             .Returns(new Room());
         _unitOfWork.UserRepository.GetByIdAsync(messageDto.UserId)
             .Returns(new User());
+        _unitOfWork.MessageRepository.CreateAsync(Arg.Any<Message>())
+            .Returns(Task.CompletedTask);
         _unitOfWork.SaveAsync()
             .Returns(Task.CompletedTask);
 
@@ -113,9 +116,9 @@ public class MessageServiceTests
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
     }
-    
+
     [Fact]
-    public async Task CreateAsync_CreateInvalidMessage_ReturnsSuccessfulProcess()
+    public async Task CreateAsync_CreateInvalidMessage_ReturnsFail()
     {
         // Arrange
         var messageDto = new MessageDto()
@@ -127,13 +130,74 @@ public class MessageServiceTests
         };
 
         _validator.ValidateAsync(Arg.Any<MessageDto>(), CancellationToken.None)
-            .Returns(new ValidationResult());
-   
+            .Returns(new ValidationResult(new List<ValidationFailure>()));
+
         // Act
         var result = await _messageService.CreateAsync(messageDto);
 
         // Assert
         await _validator.Received(1).ValidateAsync(Arg.Any<MessageDto>(), CancellationToken.None);
+
+        Assert.True(result.IsFailed);
+    }
+
+    [Fact]
+    public async Task CreateAsync_CreateAnonymMessage_ReturnsSuccess()
+    {
+        // Arrange
+        var messageDto = new MessageDto()
+        {
+            Content = "Hello!",
+            CreatedAt = DateTime.UtcNow,
+            RoomId = 1,
+            UserId = null,
+        };
+
+        _validator.ValidateAsync(Arg.Any<MessageDto>(), CancellationToken.None)
+            .Returns(new ValidationResult());
+        _unitOfWork.RoomRepository.GetByIdAsync(messageDto.RoomId)
+            .Returns(new Room());
+        _unitOfWork.MessageRepository.CreateAsync(Arg.Any<Message>())
+            .Returns(Task.CompletedTask);
+        _unitOfWork.SaveAsync()
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _messageService.CreateAsync(messageDto);
+
+        // Assert
+        await _validator.Received(1).ValidateAsync(Arg.Any<MessageDto>(), CancellationToken.None);
+        await _unitOfWork.RoomRepository.Received(1).GetByIdAsync(messageDto.RoomId);
+        await _unitOfWork.MessageRepository.Received(1).CreateAsync(Arg.Any<Message>());
+        await _unitOfWork.Received(1).SaveAsync();
+
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+    }
+    
+    [Fact]
+    public async Task CreateAsync_CreateMessageWithNotExistingRoomId_ReturnsFail()
+    {
+        // Arrange
+        var messageDto = new MessageDto()
+        {
+            Content = "Hello!",
+            CreatedAt = DateTime.UtcNow,
+            RoomId = 150,
+            UserId = 1,
+        };
+
+        _validator.ValidateAsync(Arg.Any<MessageDto>(), CancellationToken.None)
+            .Returns(new ValidationResult());
+        _unitOfWork.RoomRepository.GetByIdAsync(messageDto.RoomId)
+            .Returns((Room)null);
+
+        // Act
+        var result = await _messageService.CreateAsync(messageDto);
+
+        // Assert
+        await _validator.Received(1).ValidateAsync(Arg.Any<MessageDto>(), CancellationToken.None);
+        await _unitOfWork.RoomRepository.Received(1).GetByIdAsync(messageDto.RoomId);
 
         Assert.True(result.IsFailed);
     }
