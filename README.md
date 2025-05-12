@@ -67,7 +67,7 @@ Additional:
 - Blazored.LocalStorage - LocalStorage library for Blazor. <br/>
   *Chosen* for its straightforward integration with local storage.
 
-Libraries(tests):
+Libraries (tests):
 - XUnit - Test framework.
 - NSubstitute - Mocking library.
 - AwesomeAssertions - Fork of FluentAssertions under a free license.
