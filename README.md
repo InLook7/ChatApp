@@ -47,9 +47,11 @@ Main:
   - EF Core - ORM framework for database interaction.
   - Microsoft.Azure.SignalR - SignalR service for real-time communication.
   - Microsoft.AspNetCore.SignalR.Client - SignalR interaction on the client side.
+  - Microsoft.AspNetCore.Authentication.JwtBearer - JWT authentication library.
+  - Microsoft.AspNetCore.OpenApi - OpenAPI documentation library.
   - Azure.AI.TextAnalytics - Sentiment analysis integration.
 
-Libraries:
+Additional:
 - FluentValidation - Validation library. <br/>
   *Chosen* for its ergonomic way of writing validation rules.
   <br/><br/>
@@ -62,13 +64,19 @@ Libraries:
 - Scalar.AspNetCore - UI for OpenApi specification. <br/>
   *Chosen* as an alternative to Swagger UI because it looks better (IMHO).
   <br/><br/>
-- Microsoft.AspNetCore.Authentication.JwtBearer - JWT authentication library.
-  <br/><br/>
-- Microsoft.AspNetCore.OpenApi - OpenAPI documentation library.
-  <br/><br/>
-- Blazored.LocalStorage - LocalStorage library for Blazor.
+- Blazored.LocalStorage - LocalStorage library for Blazor. <br/>
+  *Chosen* for its straightforward integration with local storage.
 
 Libraries(tests):
 - XUnit - Test framework.
-  <br/><br/>
 - NSubstitute - Mocking library.
+- AwesomeAssertions - Fork of FluentAssertions under a free license.
+- Coverlet.msbuild - Code coverage library.
+
+## Code coverage
+
+**Chat.Application.UnitTests** contains a code coverage file - *coverage.cobertura.xml*.
+<br/><br/>
+Code coverage results:
+<br/>
+<img src="assets/coverage.jpg" width="300"/>
