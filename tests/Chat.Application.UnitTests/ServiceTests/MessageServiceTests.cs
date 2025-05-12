@@ -56,6 +56,7 @@ public class MessageServiceTests
 
         // Assert
         await _unitOfWork.RoomRepository.Received(1).GetByIdAsync(room.Id);
+        await _unitOfWork.MessageRepository.Received(1).GetAllByRoomIdAsync(room.Id);
 
         Assert.True(result.IsSuccess);
         Assert.Equal(messages.Count, result.Value.Count());
